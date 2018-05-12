@@ -39,6 +39,8 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # Added Gems
 gem 'graphql', '1.7.4'
 gem 'graphiql-rails', '1.4.4', group: :development
+# allowing you to easily store a secure hash of your users' passwords.
+gem 'bcrypt', '~> 3.1.7'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -6,6 +6,8 @@ class GraphqlController < ApplicationController
     context = {
       # Query context goes here, for example:
       # current_user: current_user,
+      session: session,
+      current_user: current_user
     }
     result = GraphqlDemoSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
@@ -29,5 +31,19 @@ class GraphqlController < ApplicationController
     else
       raise ArgumentError, "Unexpected parameter: #{ambiguous_param}"
     end
+  end
+
+  def current_user
+    # if we want to change the sign-in strategy, this is the place todo it
+    return unless session[:token]
+
+    crypt = ActiveSupport::MessageEncryptor.new(Rails.application.secrets.secret_key_base.byteslice(0..31))
+    token = crypt.decrypt_and_verify(session[:token])
+    
+    user_id = token.gsub('user-id:', '').to_i
+    User.find_by(id: user_id)
+
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    nil
   end
 end

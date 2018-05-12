@@ -9,9 +9,16 @@ class Resolvers::CreateLink < GraphQL::Function
     # the mutation method
     # _obj - is parent object, which in this case is nil
     # args - are the arguments passed
-    # _ctx - is the GraphQL context (which would be discussed later)
-    def call(_obj, args, _ctx)
-      Link.create!(description: args[:description], url: args[:url])
+    # ctx - is the GraphQL context
+    def call(_obj, args, ctx)
+      Link.create!(
+        url: args[:url],
+        description: args[:description],
+        user: ctx[:current_user]
+      )
+
+    rescue ActiveRecord::RecordInvalid => e
+      GraphQL::ExecutionError.new(e.record.errors.full_messages.join(', '))
     end
   end
   
